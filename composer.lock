@@ -1,0 +1,194 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "21e42164d8f4c4dd4f6ad04eac3f625d",
+    "content-hash": "f1460581253d6f9e16e19901e8aef73d",
+    "packages": [
+        {
+            "name": "jitsu/array",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bdusell/jitsu-array.git",
+                "reference": "864ce9b83b3222c297b2f1c6fc8c87b5093ef7a2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bdusell/jitsu-array/zipball/864ce9b83b3222c297b2f1c6fc8c87b5093ef7a2",
+                "reference": "864ce9b83b3222c297b2f1c6fc8c87b5093ef7a2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jitsu\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian DuSell",
+                    "email": "bdusell@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Normalized API for PHP's array functions",
+            "keywords": [
+                "array",
+                "utility"
+            ],
+            "time": "2015-09-19 00:28:51"
+        },
+        {
+            "name": "jitsu/http",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bdusell/jitsu-http.git",
+                "reference": "383da1bdf036d351b77a8c228b3e4357d4dfe8f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bdusell/jitsu-http/zipball/383da1bdf036d351b77a8c228b3e4357d4dfe8f1",
+                "reference": "383da1bdf036d351b77a8c228b3e4357d4dfe8f1",
+                "shasum": ""
+            },
+            "require": {
+                "jitsu/array": "^0.1.0",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jitsu\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian DuSell",
+                    "email": "bdusell@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Object-oriented HTTP request and response interfaces",
+            "keywords": [
+                "http",
+                "request",
+                "response"
+            ],
+            "time": "2015-09-19 05:56:38"
+        },
+        {
+            "name": "jitsu/string",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bdusell/jitsu-string.git",
+                "reference": "e5bb2aa3dd22e8248dbccc5df0f3708e532a4e11"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bdusell/jitsu-string/zipball/e5bb2aa3dd22e8248dbccc5df0f3708e532a4e11",
+                "reference": "e5bb2aa3dd22e8248dbccc5df0f3708e532a4e11",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jitsu\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian DuSell",
+                    "email": "bdusell@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Normalized API for PHP's string functions",
+            "keywords": [
+                "string",
+                "utility"
+            ],
+            "time": "2015-09-18 07:27:49"
+        },
+        {
+            "name": "jitsu/util",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bdusell/jitsu-util.git",
+                "reference": "45558dc120e185f45a160298cd47781dbe90150a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bdusell/jitsu-util/zipball/45558dc120e185f45a160298cd47781dbe90150a",
+                "reference": "45558dc120e185f45a160298cd47781dbe90150a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Jitsu\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian DuSell",
+                    "email": "bdusell@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "General-purpose utilities for PHP",
+            "keywords": [
+                "introspection",
+                "lazy",
+                "reflection",
+                "singleton",
+                "utility"
+            ],
+            "time": "2015-09-19 01:40:08"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

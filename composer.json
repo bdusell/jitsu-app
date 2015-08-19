@@ -1,0 +1,18 @@
+{
+  "name": "jitsu/app",
+  "description": "Extensible routing and configuration mechanisms",
+  "bin": [
+    "bin/jitsu-config-template.php",
+    "bin/jitsu-config-template"
+  ],
+  "require": {
+    "jitsu/util": "^0.1.0",
+    "jitsu/string": "^0.1.0",
+    "jitsu/http": "^0.1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Jitsu\\App\\": "src/"
+    }
+  }
+}
