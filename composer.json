@@ -1,6 +1,15 @@
 {
   "name": "jitsu/app",
   "description": "Extensible routing and configuration mechanisms",
+  "keywords": ["routing", "configuration", "config", "application", "app"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Brian DuSell",
+      "email": "bdusell@gmail.com",
+      "role": "Developer"
+    }
+  ],
   "bin": [
     "bin/jitsu-config-template.php",
     "bin/jitsu-config-template"
