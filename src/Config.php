@@ -3,29 +3,54 @@
 namespace Jitsu\App;
 
 /**
- * A generic collection of configuration settings.
+ * An object whose properties store configuration settings.
  *
- * Extensions may add getter and setter functions by defining methods prefixed
- * with `get_` and `set_`.
+ * Usage is very simple. It behaves just like an `stdObject`, where properties
+ * can be set and accessed at will.
+ *
+ *     $config = new Config(['a' => 1]);
+ *     $config->b = 2;
+ *     echo $config->a, ' ', $config->b, "\n";
+ * 
+ * Sub-classes may add dynamic getter and setter functions for specific
+ * properties by defining methods prefixed with `get_` and `set_`, followed by
+ * the name of the simulated property.
+ *
+ * Configuration settings may be read from any PHP file which assigns properties
+ * to a pre-defined variable called `$config`. For example:
+ *
+ * **config.php**
+ *
+ *     $config->a = 1;
+ *     $config->b = 2;
+ *
+ * To read the file:
+ *
+ *     $config = new Config('config.php');
  */
 class Config {
 
 	private $attrs = array();
 
 	/**
-	 * Initialize with a file name or an array of attributes.
+	 * Initialize with the name of a PHP file or an `array` of properties.
+	 *
+	 * @param string|array $args,...
 	 */
-	public function __construct() {
+	public function __construct(/* $args,... */) {
 		foreach(func_get_args() as $arg) {
 			$this->merge($arg);
 		}
 	}
 
 	/**
-	 * Read settings from a file.
+	 * Read settings from a PHP file.
 	 *
 	 * This simply evaluates a PHP file with this object assigned to
 	 * `$config`.
+	 *
+	 * @param string $filename
+	 * @return $this
 	 */
 	public function read($filename) {
 		$config = $this;
@@ -34,7 +59,13 @@ class Config {
 	}
 
 	/**
-	 * Set a variable.
+	 * Set/add a property.
+	 *
+	 * @param string|array $name The name of the property to set.
+	 *        Alternatively, pass a single `array` to set multiple
+	 *        properties.
+	 * @param mixed $value
+	 * @return $this
 	 */
 	public function set($name, $value = null) {
 		if(func_num_args() === 1) {
@@ -46,15 +77,16 @@ class Config {
 	}
 
 	/**
-	 * Merge configuration settings.
+	 * Set/add multiple properties.
 	 *
-	 * If a string is passed, reads settings from the named file.
+	 * @param string|array $arg The name of a file to read or an array
+	 *        of properties to set.
 	 */
 	public function merge($arg) {
 		if(is_string($arg)) {
 			$this->read($arg);
 		} else {
-			$this->_set_many($name);
+			$this->_set_many($arg);
 		}
 		return $this;
 	}
@@ -79,7 +111,11 @@ class Config {
 	}
 
 	/**
-	 * Get a variable or a default value.
+	 * Get a property.
+	 *
+	 * @param string $name The name of the property.
+	 * @param mixed $default Default value to get if the property does not
+	 *                       exist.
 	 */
 	public function get($name, $default = null) {
 		$getter = 'get_' . $name;
@@ -88,7 +124,8 @@ class Config {
 		} else {
 			return (
 				array_key_exists($name, $this->attrs) ?
-				$this->attrs[$name] : $default
+				$this->attrs[$name] :
+				$default
 			);
 		}
 	}
@@ -97,6 +134,12 @@ class Config {
 		return $this->get($name);
 	}
 
+	/**
+	 * Tell whether a certain property exists.
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
 	public function has($name) {
 		return array_key_exists($name, $this->attrs);
 	}

@@ -2,10 +2,16 @@
 
 namespace Jitsu\App\Handlers;
 
+/**
+ * Callable-to-handler adapter class.
+ */
 class Callback implements \Jitsu\App\Handler {
 
 	private $callback;
 
+	/**
+	 * @param callable $callback
+	 */
 	public function __construct($callback) {
 		$this->callback = $callback;
 	}

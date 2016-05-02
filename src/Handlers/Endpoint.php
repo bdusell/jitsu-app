@@ -2,10 +2,18 @@
 
 namespace Jitsu\App\Handlers;
 
+/**
+ * Matches a combination of HTTP method and URL.
+ */
 class Endpoint extends Route {
 
 	private $method;
 
+	/**
+	 * @param string $method
+	 * @param string $route
+	 * @param callable $callback
+	 */
 	public function __construct($method, $route, $callback) {
 		parent::__construct($route, $callback);
 		$this->method = strtoupper($method);

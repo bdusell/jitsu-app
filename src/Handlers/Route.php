@@ -2,10 +2,22 @@
 
 namespace Jitsu\App\Handlers;
 
+/**
+ * Matches a particular URL pattern.
+ */
 class Route extends Condition {
 
 	private $route;
 
+	/**
+	 * The route can accept a simple pattern syntax: `:id` to match a path
+	 * segment named `id`, `*path` to match a portion of the URL named
+	 * `path` which may span multiple segments , and `(optional)` to an
+	 * optional section. Named parameters will be collected in the array
+	 * `$data->parameters`.
+	 *
+	 * @param string $route A URL pattern. 
+	 */
 	public function __construct($route, $callback) {
 		parent::__construct($callback);
 		$this->route = $route;
@@ -15,11 +27,12 @@ class Route extends Condition {
 		$route = Util::requireProp($data, 'route');
 		list($regex, $mapping) = Util::patternToRegex($this->route);
 		$r = (bool) preg_match($regex, $route, $matches);
-		$named_matches = array();
-		for($i = 1, $n = count($matches); $i < $n; ++$i) {
-			$named_matches[$mapping[$i - 1]] = urldecode($matches[$i]);
+		if($r) {
+			Util::ensureArray($data, 'parameters');
+			array_replace(
+				$data->parameters,
+				Util::namedMatches($matches, $mapping));
 		}
-		$data->parameters = $named_matches;
 		return $r;
 	}
 }

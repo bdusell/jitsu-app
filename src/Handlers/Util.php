@@ -16,7 +16,7 @@ class Util {
 		return $value === '' ? '\\' : "\\$value\\";
 	}
 
-	public static function patternToRegex($pat) {
+	public static function patternToRegexCore($pat) {
 		$mapping = array();
 		$regex = preg_replace_callback(
 			'#(?::([A-Za-z_]\\w*($)?))|(?:\\*([A-Za-z_]\\w*))|(\\()|(\\))|(.)#',
@@ -37,6 +37,30 @@ class Util {
 			},
 			$pat
 		);
+		return array($regex, $mapping);
+	}
+
+	public static function patternToRegex($pat) {
+		list($regex, $mapping) = self::patternToRegexCore($pat);
 		return array('#^' . $regex . '$#', $mapping);
+	}
+
+	public static function patternToStartRegex($pat) {
+		list($regex, $mapping) = self::patternToRegexCore($pat);
+		return array('#^' . $regex . '#', $mapping);
+	}
+
+	public static function namedMatches($matches, $mapping) {
+		$named_matches = array();
+		for($i = 1, $n = count($matches); $i < $n; ++$i) {
+			$named_matches[$mapping[$i - 1]] = urldecode($matches[$i]);
+		}
+		return $named_matches;
+	}
+
+	public static function ensureArray($data, $name) {
+		if(!\Jitsu\Util::hasProp($data, $name)) {
+			$data->$name = array();
+		}
 	}
 }
