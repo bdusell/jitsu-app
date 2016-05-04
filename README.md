@@ -21,6 +21,8 @@ This module is thus designed to solve two problems: the need for a less
 primitive way of routing HTTP requests, and the need to design applications in
 a way that is amenable to configuration and testing.
 
+This package is part of [Jitsu](https://github.com/bdusell/jitsu).
+
 ## Installation
 
 Install this package with [Composer](https://getcomposer.org/):
@@ -61,8 +63,8 @@ request and response through an abstract, object-oriented interface, making it
 possible to stub out these objects when testing your application. Using
 dependency injection, you can send a simulated HTTP request to your application
 and capture its response in test, provided it is designed around these
-object-oriented interfaces. The `RequestInterface` and `ResponseInterface`
-interfaces are found in [jitsu/http](https://github.com/bdusell/jitsu-http).
+object-oriented interfaces. The request and response interfaces are found in
+[jitsu/http](https://github.com/bdusell/jitsu-http).
 
 Another integral feature of the router is its use of a configuration mechanism
 which allows routes to be hosted at an arbitrary external mount point. For
@@ -226,16 +228,28 @@ to match any of the routes above. Finally, the `error` handler is entered into
 a separate callback queue which is executed whenever a handler throws an
 exception.
 
-Note that URLs are specified as patterns, allowing certain path segments to be
-captured. The pattern syntax is as follows:
+Note that URLs are specified as Rails-style patterns, allowing certain path
+segments to be captured. The supported pattern syntax is as follows:
 
-* A `:` followed by a parameter name captures everything except for a `/`.
-  URL-encoded slashes can still get through. Example: `users/:id` matches
-  `users/42` but not `users/a/b/c`.
-* A `*` followed by a parameter name captures everything, including slashes.
-  Example: `assets/*path` matches `assets/path/to/img.jpg`
-* A pair of `()` encloses an optional section. Example: `users/(index)` matches
-  `users/` and `users/index`.
+* `:name` is a variable which captures everything except for a `/` and
+  associates the captured text with a parameter called `name`. URL-encoded
+  slashes can still get through.<sup>1</sup> Example: `users/:id` matches
+  `users/42` and assigns `id` = `42`, but it does not match `users/a/b/c`.
+* `*name` is a glob which captures everything, including slashes, and
+  associates the captured text with a parameter called `name`. Example:
+  `assets/*path` matches `assets/path/to/img.jpg` and assigns `path` =
+  `path/to/img.jpg`.
+* A pair of `()` encloses an optional section. Example: `users/(index.html)`
+  matches `users/` and `users/index.html`.
+
+Patterns are tested in order, so they should be listed in decreasing order of
+specificity.
+
+```php
+$this->get('users/me', 'showCurrentUser');
+$this->get('users/:id', 'showUser');
+$this->get('*path', 'pageNotFound');
+```
 
 All parameters are collected in `$data->parameters`, an ordered array whose
 keys are the parameter names. All values are automatically URL-decoded.
@@ -247,7 +261,7 @@ response, and configuration object.
 
 ```php
 require_once __DIR__ . '/MyApplication.php';
-MyApplication::respond(
+(new MyApplication())->respond(
   new \Jitsu\Http\CurrentRequest(),
   new \Jitsu\Http\CurrentResponse(),
   new \Jitsu\App\SiteConfig(__DIR__ . '/config.php'));
@@ -258,6 +272,19 @@ the following shorthand:
 
 ```php
 MyApplication::main(new \Jitsu\App\SiteConfig(__DIR__ . '/config.php'));
+```
+
+<sup>1</sup> The router itself allows forward slashes to be encoded in path
+components, but some server configurations may disallow this. For example,
+Apache might be configured, by default, to re-encode encoded forward slashes
+in incoming URLs, or to refuse such requests with 404 Not Found. This is a
+security measure to prevent those with ill intent from gaining access to paths
+on the filesystem through unsanitized inputs. You can allow encoded slashes by
+adding the following directive in the virtual host in your Apache configuration
+file:
+
+```apache
+AllowEncodedSlashes NoDecode
 ```
 
 ## API

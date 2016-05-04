@@ -4,6 +4,9 @@ namespace Jitsu\App\Handlers;
 
 /**
  * Callable-to-handler adapter class.
+ *
+ * Affected by the property `$data->app_namespace`, which dictates the default
+ * namespace of any callbacks that are passed as strings.
  */
 class Callback implements \Jitsu\App\Handler {
 

@@ -22,12 +22,11 @@ abstract class Application extends Router {
 	/**
 	 * Dispatch a request to this router.
 	 *
-	 * @param \Jitsu\Http\RequestInterface $request The HTTP request
-	 *        object. This will be made available to handlers via
-	 *        `$data->request`.
-	 * @param \Jitsu\Http\ResponseInterface $response The HTTP response
-	 *        object with which the application code will interact. This
-	 *        will be made available to handlers via `$data->response`.
+	 * @param \Jitsu\Http\RequestBase $request The HTTP request object.
+	 *        This will be made available to handlers via `$data->request`.
+	 * @param \Jitsu\Http\ResponseBase $response The HTTP response object
+	 *        with which the application code will interact. This will be
+	 *        made available to handlers via `$data->response`.
 	 * @param \Jitsu\App\SiteConfig $config Configuration settings for the
 	 *        router. This will be made available to handlers via
 	 *        `$data->config`.
@@ -47,7 +46,9 @@ abstract class Application extends Router {
 	 * @param \Jitsu\App\SiteConfig $config Configuration settings for the
 	 *        router.
 	 */
-	public static function main($app, $config) {
+	public static function main($config) {
+		$class = get_called_class();
+		$app = new $class;
 		return $app->respond(
 			new \Jitsu\Http\CurrentRequest,
 			new \Jitsu\Http\CurrentResponse,
@@ -97,9 +98,25 @@ abstract class Application extends Router {
 	}
 
 	/**
-	 * Handle all requests to a certain path, regardless of method.
+	 * Handle all requests to a certain path.
 	 *
-	 * @param string $route The path.
+	 * The path is specified as a pattern which may contain named
+	 * parameters. The following syntax is supported:
+	 *
+	 * * `:name`, which captures a non-empty portion of a path segment
+	 *   called `name`. This will not match slash (`/`) characters.
+	 * * `*name`, which captures a portion of text called `name` which can
+	 *   span multiple path segments. This will match any character.
+	 * * `(optional)`, where the portion enclosed by `()` characters may
+	 *   optionally be present. Any pattern syntax may appear inside the
+	 *   optional portion.
+	 *
+	 * Any named parameters will automatically be URL-decoded and stored in
+	 * `$data->parameters`, an array mapping parameter names to captured
+	 * values. The key-value pairs will occur in the same order as the
+	 * parameters were specified.
+	 *
+	 * @param string $route A path pattern.
 	 * @param callable $callback
 	 */
 	public function route($route, $callback) {
@@ -110,7 +127,7 @@ abstract class Application extends Router {
 	 * Handle all requests to a certain combination of method and path.
 	 *
 	 * @param string $method The method (`GET`, `POST`, etc.).
-	 * @param string $route The path.
+	 * @param string $route A path pattern.
 	 * @param callable $callback
 	 */
 	public function endpoint($method, $route, $callback) {
@@ -120,7 +137,7 @@ abstract class Application extends Router {
 	/**
 	 * Handle a GET request to a certain path.
 	 *
-	 * @param string $route The path.
+	 * @param string $route A path pattern.
 	 * @param callable $callback
 	 */
 	public function get($route, $callback) {
@@ -130,7 +147,7 @@ abstract class Application extends Router {
 	/**
 	 * Handle a POST request to a certain path.
 	 *
-	 * @param string $route The path.
+	 * @param string $route A path pattern.
 	 * @param callable $callback
 	 */
 	public function post($route, $callback) {
@@ -140,7 +157,7 @@ abstract class Application extends Router {
 	/**
 	 * Handle a PUT request to a certain path.
 	 *
-	 * @param string $route The path.
+	 * @param string $route A path pattern.
 	 * @param callable $callback
 	 */
 	public function put($route, $callback) {
@@ -150,7 +167,7 @@ abstract class Application extends Router {
 	/**
 	 * Handle a DELETE request to a certain path.
 	 *
-	 * @param string $route the path.
+	 * @param string $route A path pattern.
 	 * @param callable $callback
 	 */
 	public function delete($route, $callback) {
@@ -160,7 +177,12 @@ abstract class Application extends Router {
 	/**
 	 * Mount a sub-router at a certain path.
 	 *
-	 * @param string $route The path where the sub-router will be mounted.
+	 * Stops routing if and only if the sub-router matches. Routing
+	 * continues if the sub-router does not match, even if the mount point
+	 * matched.
+	 *
+	 * @param string $route A path pattern indicating where the sub-router
+	 *                      will be mounted.
 	 * @param \Jitsu\App\Router $router
 	 */
 	public function mount($route, $router) {
@@ -170,6 +192,9 @@ abstract class Application extends Router {
 	/**
 	 * Handles any request whose URL was matched in an earlier handler but
 	 * was not handled because the method did not match.
+	 *
+	 * The property `$data->matched_methods` will contain the list of
+	 * allowed methods for this URL.
 	 *
 	 * @param callable $callback
 	 */
@@ -189,9 +214,10 @@ abstract class Application extends Router {
 	/**
 	 * Handles any exceptions thrown by request handlers.
 	 *
+	 * The property `$data->exception` will be set to the exception thrown.
+	 *
 	 * @param callable $callback A callback which accepts a single
-	 *        `stdObject $data` argument. The `$data->exception` property
-	 *        will be set to the exception thrown.
+	 *                           `stdObject` argument.
 	 */
 	public function error($callback) {
 		$this->errorHandler(new Handlers\Always($callback));

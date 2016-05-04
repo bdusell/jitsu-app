@@ -12,6 +12,8 @@ call_user_func(function() use($argv) {
 		echo <<<TXT
 Usage: $script_name [-c|--config <config-file> ...] <php-file>
 
+  Inject configuration settings into a PHP template.
+
 TXT
 		;
 	};

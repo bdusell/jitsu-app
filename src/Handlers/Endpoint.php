@@ -4,6 +4,9 @@ namespace Jitsu\App\Handlers;
 
 /**
  * Matches a combination of HTTP method and URL.
+ *
+ * If the URL matches but the method does not, the method is added to
+ * `$data->available_methods`.
  */
 class Endpoint extends Route {
 

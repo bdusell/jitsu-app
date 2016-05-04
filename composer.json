@@ -15,6 +15,7 @@
     "bin/jitsu-config-template"
   ],
   "require": {
+    "php": ">=5.3.0",
     "jitsu/util": "^0.1.0",
     "jitsu/string": "^0.1.0",
     "jitsu/http": "^0.1.0"
