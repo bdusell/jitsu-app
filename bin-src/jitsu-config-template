@@ -1,5 +1,5 @@
 #!/usr/bin/env php
 <?php
-require dirname(dirname(__DIR__)) . '/jitsu/error/error.php';
-require dirname(dirname(__DIR__)) . '/autoload.php';
-require dirname(__DIR__) . '/bin-src/jitsu-config-template.php';
+require dirname(dirname(__DIR__)) . '/error/error.php';
+require dirname(dirname(dirname(__DIR__))) . '/autoload.php';
+require __DIR__ . '/jitsu-config-template.php';
