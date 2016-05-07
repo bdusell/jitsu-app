@@ -293,3 +293,456 @@ AllowEncodedSlashes NoDecode
 
 ## API
 
+### class Jitsu\\App\\Application
+
+Extends `Router`.
+
+An extensible top-level HTTP request router.
+
+#### new Application()
+
+Automatically adds a configuration handler.
+
+### class Jitsu\\App\\SubRouter
+
+Extends `Router`.
+
+An extensible sub-router which can be mounted in another router.
+
+#### new SubRouter()
+
+### class Jitsu\\App\\Router
+
+Extends `BasicRouter`.
+
+An extensible HTTP request router.
+
+Like `BasicRouter` but with fancy shortcut methods.
+
+#### abstract protected function initialize()
+
+Override this method to configure routes and handlers on this
+router.
+
+#### $router->respond($request, $response, $config)
+
+Dispatch a request to this router.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$request`** | `\Jitsu\Http\RequestBase` | The HTTP request object. This will be made available to handlers via `$data->request`. |
+| **`$response`** | `\Jitsu\Http\ResponseBase` | The HTTP response object with which the application code will interact. This will be made available to handlers via `$data->response`. |
+| **`$config`** | `\Jitsu\App\SiteConfig` | Configuration settings for the router. This will be made available to handlers via `$data->config`. |
+
+#### Router::main($config)
+
+Shorthand for `respond` which invokes the router with the current
+HTTP request and response.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$config`** | `\Jitsu\App\SiteConfig` | Configuration settings for the router. |
+
+#### $router->callback($callback)
+
+Add a callback to the request handler queue.
+
+The callback will receive a single `stdObject` argument (`$data`)
+which has been passed through earlier handlers. The handler may read
+properties from this object to access data from earlier handlers and
+assign properties to pass data to later handlers. The router
+initially adds the properties `request`, `response`, and `config`.
+
+The handler should return `true` if routing should cease with this
+handler (indicating a match) or `false` if the router should
+continue to attempt to match later routes. A handler can perform
+some action or add to `$data` without returning `true`, so that it
+merely serves to communicate with later handlers.
+
+Callbacks are executed in the same order they are added.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$callback`** | `callable` | A callback which accepts a single `stdObject` argument and returns a `bool` to indicate whether it has handled the request and the router should stop dispatching. |
+
+#### $router->setNamespace($value)
+
+Set the namespace which will be automatically prefixed to the names
+of callbacks passed to all handler functions.
+
+Function names are accepted as callbacks in all of the callback
+registration methods here. If all of your callbacks are under one
+namespace, this can be used to avoid repeating the namespace in all
+function names.
+
+|   | Type |
+|---|------|
+| **`$value`** | `string` |
+
+#### $router->route($route, $callback)
+
+Handle all requests to a certain path.
+
+The path is specified as a pattern which may contain named
+parameters. The following syntax is supported:
+
+* `:name`, which captures a portion of a path segment called `name`.
+  This will not match slash (`/`) characters.
+* `*name`, which captures a portion of text called `name` which can
+  span multiple path segments. This will match any character.
+* `(optional)`, where the portion enclosed by `()` characters may
+  optionally be present. Any pattern syntax may appear inside the
+  optional portion.
+
+Any named parameters will automatically be URL-decoded and stored in
+`$data->parameters`, an array mapping parameter names to captured
+values. The key-value pairs will occur in the same order as the
+parameters were specified.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$route`** | `string` | A path pattern. |
+| **`$callback`** | `callable` |  |
+
+#### $router->endpoint($method, $route, $callback)
+
+Handle all requests to a certain combination of method and path.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$method`** | `string` | The method (`GET`, `POST`, etc.). |
+| **`$route`** | `string` | A path pattern. |
+| **`$callback`** | `callable` |  |
+
+#### $router->get($route, $callback)
+
+Handle a GET request to a certain path.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$route`** | `string` | A path pattern. |
+| **`$callback`** | `callable` |  |
+
+#### $router->post($route, $callback)
+
+Handle a POST request to a certain path.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$route`** | `string` | A path pattern. |
+| **`$callback`** | `callable` |  |
+
+#### $router->put($route, $callback)
+
+Handle a PUT request to a certain path.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$route`** | `string` | A path pattern. |
+| **`$callback`** | `callable` |  |
+
+#### $router->delete($route, $callback)
+
+Handle a DELETE request to a certain path.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$route`** | `string` | A path pattern. |
+| **`$callback`** | `callable` |  |
+
+#### $router->mount($route, $router)
+
+Mount a sub-router at a certain path.
+
+Stops routing if and only if the sub-router matches. Routing
+continues if the sub-router does not match, even if the mount point
+matched.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$route`** | `string` | A path pattern indicating where the sub-router will be mounted. |
+| **`$router`** | `\Jitsu\App\Router` |  |
+
+#### $router->badMethod($callback)
+
+Handles any request whose URL was matched in an earlier handler but
+was not handled because the method did not match.
+
+The property `$data->matched_methods` will contain the list of
+allowed methods for this URL.
+
+|   | Type |
+|---|------|
+| **`$callback`** | `callable` |
+
+#### $router->notFound($callback)
+
+Handles any request which was not matched in an earlier handler.
+
+|   | Type |
+|---|------|
+| **`$callback`** | `callable` |
+
+#### $router->error($callback)
+
+Handles any exceptions thrown by request handlers.
+
+The property `$data->exception` will be set to the exception thrown.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$callback`** | `callable` | A callback which accepts a single `stdObject` argument. |
+
+### class Jitsu\\App\\BasicRouter
+
+Basic router class.
+
+The router consists of two queues: the normal request handler queue, and
+the error handler queue. The router calls request handlers in the same
+order they were registered until one of them returns `true`. If a handler
+throws an exception, control passes irreversibly to the error handler queue,
+which behaves in the same way but has no rescue strategy for exceptions.
+
+#### new BasicRouter()
+
+#### $basic\_router->handler($handler)
+
+Add a handler to the request handler queue.
+
+|   | Type |
+|---|------|
+| **`$handler`** | `\Jitsu\App\Handler` |
+
+#### $basic\_router->errorHandler($handler)
+
+Add a handler to the error handler queue.
+
+The `$data` argument to the handler will have the property
+`exception` set to the exception that was thrown.
+
+|   | Type |
+|---|------|
+| **`$handler`** | `\Jitsu\App\Handler` |
+
+#### $basic\_router->run($data)
+
+Invoke the router with some datum to be passed from handler to
+handler.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$data`** | `object` | Some datum to be passed from handler to handler. |
+| returns | `bool` | Whether the invocation was handled, meaning that routing ended when some request handler or error handler returned `true`. |
+| throws | `\Exception` | Any exception thrown by a request handler that was not handled in the error handler queue, or any exception thrown from an error handler. |
+
+### interface Jitsu\\App\\Handler
+
+A route handler interface.
+
+#### $handler->handle($data)
+
+React to a request.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$data`** | `object` | Some datum which is passed from handler to handler. |
+| returns | `bool` | Whether this handler has matched the route and the router should stop routing. |
+
+### class Jitsu\\App\\SiteConfig
+
+Extends `Config`.
+
+A subclass of `Config` specialized for websites.
+
+Adds the following properties:
+
+* `base_url`: The external URL at which the router is mounted. Tied to the
+  properties `scheme`, `host`, and `path`.
+* `scheme`: The scheme or protocol used by the site (`http` or `https`).
+* `host`: The host name of the site (such as `example.com`).
+* `path`: The path section of the `base_url`.
+* `base_path`: Like `path`, but formatted so that it always begins and ends
+   with a slash.
+* `locale`: The locale of the currently running PHP script. When setting,
+  use an array of values to indicate a series of fallbacks.
+
+#### $site\_config->set\_base\_url($url)
+
+Set the base URL of the site.
+
+If the `scheme`, `host`, or `path` can be parsed from the new value,
+they are set accordingly.
+
+|   | Type |
+|---|------|
+| **`$url`** | `string` |
+
+#### $site\_config->get\_base\_url()
+
+Get the base URL.
+
+Consists of `<scheme>://<host>/<path>`.
+
+|   | Type |
+|---|------|
+| returns | `string` |
+
+#### $site\_config->get\_base\_path()
+
+Get the `path`, formatted so that it always begins and ends with a
+slash.
+
+|   | Type |
+|---|------|
+| returns | `string` |
+
+#### $site\_config->makePath($rel\_path)
+
+Given a relative path, append it to the `path` to form an absolute
+path.
+
+This has the exception that if both are the empty string, it returns
+the empty string.
+
+|   | Type |
+|---|------|
+| **`$rel_path`** | `string` |
+| returns | `string` |
+
+#### $site\_config->removePath($abs\_path)
+
+Strip off the `path` from an absolute path, or return `null` if the
+path does not match.
+
+|   | Type |
+|---|------|
+| **`$abs_path`** | `string` |
+| returns | `string|null` |
+
+#### $site\_config->makeUrl($rel\_path)
+
+Given a relative path, append it to the `base_url` to form an
+absolute URL.
+
+A small, special case: if the configured `path` is set to the empty
+string, then an empty `$rel_path` will produce a URL consisting of
+the domain with _no_ trailing slash (e.g. `http://www.example.com`).
+This is unlike setting `path` to `/`, which will _always_ produce a
+URL with a trailing slash, even when `$rel_path` is empty (e.g.
+`http://www.example.com/`). The former is techinically malformed,
+although it may be desired, and browsers will generally still accept
+it as a hyperlink.
+
+|   | Type |
+|---|------|
+| **`$rel_path`** | `string` |
+| returns | `string` |
+
+#### $site\_config->set\_locale($value)
+
+Set the locale.
+
+If the value is an array of strings, each string serves as a
+fallback for the preceding ones in case they are not available.
+
+|   | Type |
+|---|------|
+| **`$value`** | `string|string[]` |
+
+#### $site\_config->get\_locale()
+
+Get the locale.
+
+|   | Type |
+|---|------|
+| returns | `string` |
+
+### class Jitsu\\App\\Config
+
+An object whose properties store configuration settings.
+
+Usage is very simple. It behaves just like an `stdObject`, where properties
+can be set and accessed at will.
+
+    $config = new Config(['a' => 1]);
+    $config->b = 2;
+    echo $config->a, ' ', $config->b, "\n";
+
+Sub-classes may add dynamic getter and setter functions for specific
+properties by defining methods prefixed with `get_` and `set_`, followed by
+the name of the simulated property.
+
+Configuration settings may be read from any PHP file which assigns properties
+to a pre-defined variable called `$config`. For example:
+
+**config.php**
+
+    $config->a = 1;
+    $config->b = 2;
+
+To read the file:
+
+    $config = new Config('config.php');
+
+#### new Config($args,...)
+
+Initialize with the name of a PHP file or an `array` of properties.
+
+|   | Type |
+|---|------|
+| **`$args,...`** | `string|array` |
+
+#### $config->read($filename)
+
+Read settings from a PHP file.
+
+This simply evaluates a PHP file with this object assigned to
+`$config`.
+
+|   | Type |
+|---|------|
+| **`$filename`** | `string` |
+| returns | `$this` |
+
+#### $config->set($name, $value = null)
+
+Set/add a property.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$name`** | `string|array` | The name of the property to set. Alternatively, pass a single `array` to set multiple properties. |
+| **`$value`** | `mixed` |  |
+| returns | `$this` |  |
+
+#### $config->merge($arg)
+
+Set/add multiple properties.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$arg`** | `string|array` | The name of a file to read or an array of properties to set. |
+
+#### $config->\_\_set($name, $value)
+
+#### $config->get($name, $default = null)
+
+Get a property.
+
+|   | Type | Description |
+|---|------|-------------|
+| **`$name`** | `string` | The name of the property. |
+| **`$default`** | `mixed` | Default value to get if the property does not exist. |
+
+#### $config->\_\_get($name)
+
+#### $config->has($name)
+
+Tell whether a certain property exists.
+
+|   | Type |
+|---|------|
+| **`$name`** | `string` |
+| returns | `bool` |
+
+#### $config->\_\_isset($name)
+
