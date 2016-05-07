@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "21e42164d8f4c4dd4f6ad04eac3f625d",
-    "content-hash": "f1460581253d6f9e16e19901e8aef73d",
+    "hash": "54542d286a2c60c33d8acc1725ee88f1",
+    "content-hash": "24035b47bfb54a62ddd59f814864238a",
     "packages": [
         {
             "name": "jitsu/array",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bdusell/jitsu-array.git",
-                "reference": "864ce9b83b3222c297b2f1c6fc8c87b5093ef7a2"
+                "reference": "1e86a19bbd79482d1a58862f8716e062fd724afe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bdusell/jitsu-array/zipball/864ce9b83b3222c297b2f1c6fc8c87b5093ef7a2",
-                "reference": "864ce9b83b3222c297b2f1c6fc8c87b5093ef7a2",
+                "url": "https://api.github.com/repos/bdusell/jitsu-array/zipball/1e86a19bbd79482d1a58862f8716e062fd724afe",
+                "reference": "1e86a19bbd79482d1a58862f8716e062fd724afe",
                 "shasum": ""
             },
             "require": {
@@ -49,24 +49,61 @@
                 "array",
                 "utility"
             ],
-            "time": "2015-09-19 00:28:51"
+            "time": "2016-05-07 07:25:40"
         },
         {
-            "name": "jitsu/http",
-            "version": "0.1.0",
+            "name": "jitsu/error",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/bdusell/jitsu-http.git",
-                "reference": "383da1bdf036d351b77a8c228b3e4357d4dfe8f1"
+                "url": "https://github.com/bdusell/jitsu-error.git",
+                "reference": "01f3b899d498edb13e8521df0bf1b5b13930bc3a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bdusell/jitsu-http/zipball/383da1bdf036d351b77a8c228b3e4357d4dfe8f1",
-                "reference": "383da1bdf036d351b77a8c228b3e4357d4dfe8f1",
+                "url": "https://api.github.com/repos/bdusell/jitsu-error/zipball/01f3b899d498edb13e8521df0bf1b5b13930bc3a",
+                "reference": "01f3b899d498edb13e8521df0bf1b5b13930bc3a",
                 "shasum": ""
             },
             "require": {
-                "jitsu/array": "^0.1.0",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Brian DuSell",
+                    "email": "bdusell@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Sane PHP error handling and silencing",
+            "keywords": [
+                "error",
+                "exception",
+                "handling"
+            ],
+            "time": "2016-05-07 07:40:46"
+        },
+        {
+            "name": "jitsu/http",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bdusell/jitsu-http.git",
+                "reference": "208d727f2b8311753b4166fa56c9c053a38711e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bdusell/jitsu-http/zipball/208d727f2b8311753b4166fa56c9c053a38711e1",
+                "reference": "208d727f2b8311753b4166fa56c9c053a38711e1",
+                "shasum": ""
+            },
+            "require": {
+                "jitsu/array": "^0.1.1",
                 "php": ">=5.3.0"
             },
             "type": "library",
@@ -92,20 +129,20 @@
                 "request",
                 "response"
             ],
-            "time": "2015-09-19 05:56:38"
+            "time": "2016-05-07 08:11:56"
         },
         {
             "name": "jitsu/string",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bdusell/jitsu-string.git",
-                "reference": "e5bb2aa3dd22e8248dbccc5df0f3708e532a4e11"
+                "reference": "db76c48d9dab5c3d5fe2c8a7cea491ad59dd7cc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bdusell/jitsu-string/zipball/e5bb2aa3dd22e8248dbccc5df0f3708e532a4e11",
-                "reference": "e5bb2aa3dd22e8248dbccc5df0f3708e532a4e11",
+                "url": "https://api.github.com/repos/bdusell/jitsu-string/zipball/db76c48d9dab5c3d5fe2c8a7cea491ad59dd7cc8",
+                "reference": "db76c48d9dab5c3d5fe2c8a7cea491ad59dd7cc8",
                 "shasum": ""
             },
             "require": {
@@ -136,20 +173,20 @@
                 "string",
                 "utility"
             ],
-            "time": "2015-09-18 07:27:49"
+            "time": "2016-05-07 07:55:56"
         },
         {
             "name": "jitsu/util",
-            "version": "0.1.0",
+            "version": "0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bdusell/jitsu-util.git",
-                "reference": "45558dc120e185f45a160298cd47781dbe90150a"
+                "reference": "47098d47b769e8be7a18c81565f10278a5153a50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bdusell/jitsu-util/zipball/45558dc120e185f45a160298cd47781dbe90150a",
-                "reference": "45558dc120e185f45a160298cd47781dbe90150a",
+                "url": "https://api.github.com/repos/bdusell/jitsu-util/zipball/47098d47b769e8be7a18c81565f10278a5153a50",
+                "reference": "47098d47b769e8be7a18c81565f10278a5153a50",
                 "shasum": ""
             },
             "require": {
@@ -180,7 +217,7 @@
                 "singleton",
                 "utility"
             ],
-            "time": "2015-09-19 01:40:08"
+            "time": "2016-05-07 08:01:16"
         }
     ],
     "packages-dev": [],
@@ -189,6 +226,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.3.0"
+    },
     "platform-dev": []
 }
