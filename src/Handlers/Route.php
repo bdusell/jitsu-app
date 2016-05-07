@@ -29,9 +29,10 @@ class Route extends Condition {
 		$r = (bool) preg_match($regex, $route, $matches);
 		if($r) {
 			Util::ensureArray($data, 'parameters');
-			array_replace(
-				$data->parameters,
-				Util::namedMatches($matches, $mapping));
+			$parameters = Util::namedMatches($matches, $mapping);
+			foreach($parameters as $key => $value) {
+				$data->parameters[$key] = $value;
+			}
 		}
 		return $r;
 	}

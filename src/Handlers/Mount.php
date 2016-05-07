@@ -8,7 +8,7 @@ namespace Jitsu\App\Handlers;
  * Matches if and only if the sub-router matches. Keeps going if no sub-routes
  * match, even if the mount point matched.
  */
-class Mount implements \Jistu\App\Handler {
+class Mount implements \Jitsu\App\Handler {
 
 	private $mount_point;
 	private $router;
@@ -33,7 +33,6 @@ class Mount implements \Jistu\App\Handler {
 
 		/* Temporarily modify the route so that it is relative to the
 		 * sub-router's mount point. */
-		$saved_route = $route;
 		$data->route = substr($saved_route, strlen($matches[0]));
 
 		/* Push the matched URL parameters. */

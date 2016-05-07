@@ -3,71 +3,219 @@
 namespace Jitsu\App;
 
 /**
- * Basic router class.
+ * An extensible HTTP request router.
  *
- * The router consists of two queues: the normal request handler queue, and
- * the error handler queue. The router calls request handlers in the same
- * order they were registered until one of them returns `true`. If a handler
- * throws an exception, control passes irreversibly to the error handler queue,
- * which behaves in the same way but has no rescue strategy for exceptions.
+ * Like `BasicRouter` but with fancy shortcut methods.
  */
-class Router {
+abstract class Router extends BasicRouter {
 
-	private $handlers = array();
-	private $error_handlers = array();
+	/**
+	 * Override this method to configure routes and handlers on this
+	 * router.
+	 */
+	abstract protected function initialize();
 
-	public function __construct() {
+	/**
+	 * Dispatch a request to this router.
+	 *
+	 * @param \Jitsu\Http\RequestBase $request The HTTP request object.
+	 *        This will be made available to handlers via `$data->request`.
+	 * @param \Jitsu\Http\ResponseBase $response The HTTP response object
+	 *        with which the application code will interact. This will be
+	 *        made available to handlers via `$data->response`.
+	 * @param \Jitsu\App\SiteConfig $config Configuration settings for the
+	 *        router. This will be made available to handlers via
+	 *        `$data->config`.
+	 */
+	public function respond($request, $response, $config) {
+		return $this->run((object) array(
+			'request' => $request,
+			'response' => $response,
+			'config' => $config
+		));
 	}
 
 	/**
-	 * Add a handler to the request handler queue.
+	 * Shorthand for `respond` which invokes the router with the current
+	 * HTTP request and response.
 	 *
-	 * @param \Jitsu\App\Handler $handler
+	 * @param \Jitsu\App\SiteConfig $config Configuration settings for the
+	 *        router.
 	 */
-	public function handler($handler) {
-		$this->handlers[] = $handler;
+	public static function main($config) {
+		$class = get_called_class();
+		$app = new $class;
+		return $app->respond(
+			new \Jitsu\Http\CurrentRequest,
+			new \Jitsu\Http\CurrentResponse,
+			$config
+		);
 	}
 
 	/**
-	 * Add a handler to the error handler queue.
+	 * Add a callback to the request handler queue.
 	 *
-	 * The `$data` argument to the handler will have the property
-	 * `exception` set to the exception that was thrown.
+	 * The callback will receive a single `stdObject` argument (`$data`)
+	 * which has been passed through earlier handlers. The handler may read
+	 * properties from this object to access data from earlier handlers and
+	 * assign properties to pass data to later handlers. The router
+	 * initially adds the properties `request`, `response`, and `config`.
 	 *
-	 * @param \Jitsu\App\Handler $handler
+	 * The handler should return `true` if routing should cease with this
+	 * handler (indicating a match) or `false` if the router should
+	 * continue to attempt to match later routes. A handler can perform
+	 * some action or add to `$data` without returning `true`, so that it
+	 * merely serves to communicate with later handlers.
+	 *
+	 * Callbacks are executed in the same order they are added.
+	 *
+	 * @param callable $callback A callback which accepts a single
+	 *        `stdObject` argument and returns a `bool` to indicate whether
+	 *        it has handled the request and the router should stop
+	 *        dispatching.
 	 */
-	public function errorHandler($handler) {
-		$this->error_handlers[] = $handler;
+	public function callback($callback) {
+		$this->handler(new Handlers\Callback($callback));
 	}
 
 	/**
-	 * Invoke the router with some datum to be passed from handler to
-	 * handler.
+	 * Set the namespace which will be automatically prefixed to the names
+	 * of callbacks passed to all handler functions.
 	 *
-	 * @param object $data Some datum to be passed from handler to handler.
-	 * @return bool Whether the invocation was handled, meaning that
-	 *              routing ended when some request handler or error
-	 *              handler returned `true`.
-	 * @throws \Exception Any exception thrown by a request handler that
-	 *                    was not handled in the error handler queue, or
-	 *                    any exception thrown from an error handler.
+	 * Function names are accepted as callbacks in all of the callback
+	 * registration methods here. If all of your callbacks are under one
+	 * namespace, this can be used to avoid repeating the namespace in all
+	 * function names.
+	 *
+	 * @param string $value
 	 */
-	public function run($data) {
-		foreach($this->handlers as $handler) {
-			try {
-				if($handler->handle($data)) {
-					return true;
-				}
-			} catch(\Exception $e) {
-				$data->exception = $e;
-				foreach($this->error_handlers as $error_handler) {
-					if($error_handler->handle($data)) {
-						return true;
-					}
-				}
-				throw $e;
-			}
-		}
-		return false;
+	public function setNamespace($value) {
+		$this->handler(new Handlers\SetNamespace($value));
+	}
+
+	/**
+	 * Handle all requests to a certain path.
+	 *
+	 * The path is specified as a pattern which may contain named
+	 * parameters. The following syntax is supported:
+	 *
+	 * * `:name`, which captures a portion of a path segment called `name`.
+	 *   This will not match slash (`/`) characters.
+	 * * `*name`, which captures a portion of text called `name` which can
+	 *   span multiple path segments. This will match any character.
+	 * * `(optional)`, where the portion enclosed by `()` characters may
+	 *   optionally be present. Any pattern syntax may appear inside the
+	 *   optional portion.
+	 *
+	 * Any named parameters will automatically be URL-decoded and stored in
+	 * `$data->parameters`, an array mapping parameter names to captured
+	 * values. The key-value pairs will occur in the same order as the
+	 * parameters were specified.
+	 *
+	 * @param string $route A path pattern.
+	 * @param callable $callback
+	 */
+	public function route($route, $callback) {
+		$this->handler(new Handlers\Route($route, $callback));
+	}
+
+	/**
+	 * Handle all requests to a certain combination of method and path.
+	 *
+	 * @param string $method The method (`GET`, `POST`, etc.).
+	 * @param string $route A path pattern.
+	 * @param callable $callback
+	 */
+	public function endpoint($method, $route, $callback) {
+		$this->handler(new Handlers\Endpoint($method, $route, $callback));
+	}
+
+	/**
+	 * Handle a GET request to a certain path.
+	 *
+	 * @param string $route A path pattern.
+	 * @param callable $callback
+	 */
+	public function get($route, $callback) {
+		$this->endpoint('GET', $route, $callback);
+	}
+
+	/**
+	 * Handle a POST request to a certain path.
+	 *
+	 * @param string $route A path pattern.
+	 * @param callable $callback
+	 */
+	public function post($route, $callback) {
+		$this->endpoint('POST', $route, $callback);
+	}
+
+	/**
+	 * Handle a PUT request to a certain path.
+	 *
+	 * @param string $route A path pattern.
+	 * @param callable $callback
+	 */
+	public function put($route, $callback) {
+		$this->endpoint('PUT', $route, $callback);
+	}
+
+	/**
+	 * Handle a DELETE request to a certain path.
+	 *
+	 * @param string $route A path pattern.
+	 * @param callable $callback
+	 */
+	public function delete($route, $callback) {
+		$this->endpoint('DELETE', $route, $callback);
+	}
+
+	/**
+	 * Mount a sub-router at a certain path.
+	 *
+	 * Stops routing if and only if the sub-router matches. Routing
+	 * continues if the sub-router does not match, even if the mount point
+	 * matched.
+	 *
+	 * @param string $route A path pattern indicating where the sub-router
+	 *                      will be mounted.
+	 * @param \Jitsu\App\Router $router
+	 */
+	public function mount($route, $router) {
+		$this->handler(new Handlers\Mount($route, $router));
+	}
+
+	/**
+	 * Handles any request whose URL was matched in an earlier handler but
+	 * was not handled because the method did not match.
+	 *
+	 * The property `$data->matched_methods` will contain the list of
+	 * allowed methods for this URL.
+	 *
+	 * @param callable $callback
+	 */
+	public function badMethod($callback) {
+		$this->handler(new Handlers\BadMethod($callback));
+	}
+
+	/**
+	 * Handles any request which was not matched in an earlier handler.
+	 *
+	 * @param callable $callback
+	 */
+	public function notFound($callback) {
+		$this->handler(new Handlers\Always($callback));
+	}
+
+	/**
+	 * Handles any exceptions thrown by request handlers.
+	 *
+	 * The property `$data->exception` will be set to the exception thrown.
+	 *
+	 * @param callable $callback A callback which accepts a single
+	 *                           `stdObject` argument.
+	 */
+	public function error($callback) {
+		$this->errorHandler(new Handlers\Always($callback));
 	}
 }
