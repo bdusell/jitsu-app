@@ -15,7 +15,7 @@ Moreover, where traditional PHP scripts access HTTP request data through global
 variables such as `$_GET`, `$_COOKIE`, etc., an instance of `Application` is
 fed _objects_ which represent the HTTP request and response. It is through these
 objects that the application interacts with the outside world, making it
-possible to stub them out and use them in unit testing.
+possible to stub them out during unit testing.
 
 This module is thus designed to solve two problems: the need for a less
 primitive way of routing HTTP requests, and the need to design applications in
@@ -35,8 +35,8 @@ composer require jitsu/app
 
 You're probably familiar with the usual URL routing mechanism in PHP: a URL
 ending in `.php` is mapped to a PHP script on the server of the same name.
-While this is fine for beginner projects or private tools, or when you're just
-not self-conscious about using URLs ending in `.php`, using this default
+While this is fine for beginner projects or private tools, or whenever you're
+just not self-conscious about using URLs ending in `.php`, using this default
 setting has a number of problems:
 
 * Using separate scripts for each page requires boilerplate code in every file
@@ -47,7 +47,7 @@ setting has a number of problems:
   not straightforward to actually erase the `.php`-style URLs.
 * It makes the layout of the project's source code visible to outsiders, which
   may not be desirable.
-* There are many other interesting properties of a requests besides its URL
+* There are many other interesting properties of a request besides its URL
   which might inform routing, such as its method or its `Accept` header.
 
 This package implements an alternative routing mechanism which can be used in
@@ -76,11 +76,11 @@ $config->path = 'api/';
 
 in a configuration file, all requests will be routed relative to the external
 path `api/`. So if your domain is `www.example.com/`, a request to
-`http://www.example.com/api/test/path` will maps to the `test/path` route.
+`http://www.example.com/api/test/path` will map to the `test/path` route.
 
 All handlers accept a single `$data` argument, which is an instance of
 `stdObject` that can be used to pass data from handler to handler. Through
-this object, handlers can access the request and response objects through
+this object, handlers can access the request and response objects via
 `$data->request` and `$data->response`, as well as the configuration object
 through `$data->config`. Handlers can assign properties to `$data` in order to
 communicate with downstream handlers. Similarly, you can set any additional
@@ -88,16 +88,16 @@ properties you like in your configuration file in order to inform the behavior
 of your handlers.
 
 ```php
-$config->use_output_buffering = true;
+$config->output_buffering = true;
 $config->show_stack_traces = false;
 $config->title = 'My Example Website';
 $config->log_requests = true;
 ```
 
-This package also includes an executable script, `bin/jitsu-config-template`,
-which can be used to inject configuration settings into file templates written
-in PHP. This tool can be used to generate an `.htaccess`, `robots.txt`, etc.
-file during a pre-processing step using properties defined in your site's
+This package also includes an executable script, `jitsu-config-template`, which
+can be used to inject configuration settings into file templates written in
+PHP. This tool can be used to generate an `.htaccess`, `robots.txt`, etc. file
+during a pre-processing step using properties defined in your site's
 configuration files. The script simply enables you to execute PHP files with the
 variable `$config` set to the configuration settings loaded from files listed
 on the command line. You can write these template files without any boilerplate
@@ -144,7 +144,7 @@ RewriteRule ^ index.php [L]
 
 Pretty simple. We could improve on this in a couple of ways, by telling Apache
 to go ahead and treat CSS, JavaScript, etc. as static assets, and also by
-preventing Apache from listing directory contents.
+preventing Apache from listing directory contents. Let's do that now.
 
 ```htaccess
 Options -Indexes
@@ -172,6 +172,9 @@ RewriteCond %{REQUEST_FILENAME} !-f [OR]
 RewriteCond %{REQUEST_FILENAME} !^<?= $config->document_root ?>/(.*\.(?:css|js)|favicon\.ico|robots\.txt|assets/.*)$
 RewriteRule ^ index.php [L]
 ```
+
+In fact, this will allow us to host multiple builds of the site simultaneously
+at different document roots.
 
 We could check this PHP file into version control and generate the real
 `.htaccess` file with the command
@@ -260,6 +263,7 @@ response, and configuration object.
 **index.php**
 
 ```php
+require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/MyApplication.php';
 (new MyApplication())->respond(
   new \Jitsu\Http\CurrentRequest(),
@@ -280,7 +284,7 @@ Apache might be configured, by default, to re-encode encoded forward slashes
 in incoming URLs, or to refuse such requests with 404 Not Found. This is a
 security measure to prevent those with ill intent from gaining access to paths
 on the filesystem through unsanitized inputs. You can allow encoded slashes by
-adding the following directive in the virtual host in your Apache configuration
+adding the following directive to the virtual host in your Apache configuration
 file:
 
 ```apache

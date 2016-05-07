@@ -1,8 +1,4 @@
-#!/usr/bin/env php
 <?php
-
-// vendor/jitsu/app/bin/ -> vendor/autoload.php
-require dirname(dirname(dirname(__DIR__))) . '/autoload.php';
 
 call_user_func(function() use($argv) {
 
@@ -10,7 +6,7 @@ call_user_func(function() use($argv) {
 
 	$show_usage = function() use($script_name) {
 		echo <<<TXT
-Usage: $script_name [-c|--config <config-file> ...] <php-file>
+Usage: $script_name [-c|--config <config-file>] ... <php-file>
 
   Inject configuration settings into a PHP template.
 
