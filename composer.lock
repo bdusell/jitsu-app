@@ -1,11 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "hash": "54542d286a2c60c33d8acc1725ee88f1",
-    "content-hash": "24035b47bfb54a62ddd59f814864238a",
+    "content-hash": "1677a55622d810ede46207547bbb2c2f",
     "packages": [
         {
             "name": "jitsu/array",
@@ -49,7 +48,7 @@
                 "array",
                 "utility"
             ],
-            "time": "2016-05-07 07:25:40"
+            "time": "2016-05-07T07:25:40+00:00"
         },
         {
             "name": "jitsu/error",
@@ -86,20 +85,20 @@
                 "exception",
                 "handling"
             ],
-            "time": "2016-05-07 07:40:46"
+            "time": "2016-05-07T07:40:46+00:00"
         },
         {
             "name": "jitsu/http",
-            "version": "0.2.0",
+            "version": "0.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bdusell/jitsu-http.git",
-                "reference": "208d727f2b8311753b4166fa56c9c053a38711e1"
+                "reference": "680aa40e48634da3de1d4369dead3cd6a1a432fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bdusell/jitsu-http/zipball/208d727f2b8311753b4166fa56c9c053a38711e1",
-                "reference": "208d727f2b8311753b4166fa56c9c053a38711e1",
+                "url": "https://api.github.com/repos/bdusell/jitsu-http/zipball/680aa40e48634da3de1d4369dead3cd6a1a432fb",
+                "reference": "680aa40e48634da3de1d4369dead3cd6a1a432fb",
                 "shasum": ""
             },
             "require": {
@@ -129,7 +128,7 @@
                 "request",
                 "response"
             ],
-            "time": "2016-05-07 08:11:56"
+            "time": "2020-02-11T08:16:27+00:00"
         },
         {
             "name": "jitsu/string",
@@ -173,7 +172,7 @@
                 "string",
                 "utility"
             ],
-            "time": "2016-05-07 07:55:56"
+            "time": "2016-05-07T07:55:56+00:00"
         },
         {
             "name": "jitsu/util",
@@ -217,7 +216,7 @@
                 "singleton",
                 "utility"
             ],
-            "time": "2016-05-07 08:01:16"
+            "time": "2016-05-07T08:01:16+00:00"
         }
     ],
     "packages-dev": [],
